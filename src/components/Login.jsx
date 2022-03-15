@@ -2,19 +2,27 @@ import React, { useState } from "react";
 import NavBar from "./NavBar";
 import "./Login.css";
 import api from "../Api";
+import { useHistory } from "react-router-dom";
+
 const Login = () => {
+  const history = useHistory();
+
   const [login, setLogin] = useState({
     email: "",
     senha: "",
   });
 
+  const [error, setError] = useState('');
+
   function onsubmit(e){
     e.preventDefault();
     api.post('/isValidPassword', login).then((res) => {
         if (res.data.isLogged){
-            console.log("Logado");
+          api.defaults.headers.authorization = res.data.token; //ADICIONA O HEADER AUTHORIZATION PARA GUARDAR O TOKEN
+          history.push('/main');
         }else{
-            console.log(res.data.message)
+            history.push('/');
+            setError(res.data.message);
         }
     })
   }
@@ -32,6 +40,8 @@ const Login = () => {
           <br />
           <br />
           <button className="btn btn-primary" type="submit">Entrar</button>
+
+          <label htmlFor="">{error}</label>
         </form>
       </div>
     </>
